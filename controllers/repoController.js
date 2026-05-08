@@ -57,6 +57,9 @@ async function createRepository(req, res) {
     });
 
     const result = await newRepository.save();
+    await User.findByIdAndUpdate(owner, {
+            $push: { repositories: result._id }
+    });
 
     res.status(201).json({
       message: "Repository created successfully",
