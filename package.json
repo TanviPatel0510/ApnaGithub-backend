@@ -4,7 +4,7 @@
   "description": "ApnaGithub : Github Clone",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js start"
   },
   "keywords": [],
   "author": "Tanvi Patel",
