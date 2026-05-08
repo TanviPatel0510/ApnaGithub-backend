@@ -157,25 +157,43 @@ async function fetchRepositoriesForCurrentUser(req,res){
     }
 }
 
-async function updateRepositoryById(req,res){
+async function updateRepositoryById(req, res) {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, content, visibility, userId } = req.body;
 
-    try{
+    try {
         const repository = await Repository.findById(id);
-        if(!repository){
-            return res.status(404).json({error:"Repository not found"});
+
+        if (!repository) {
+            return res.status(404).json({ error: "Repository not found" });
         }
 
-        repository.content.push(content);
-        repository.description = description;
+        // SECURITY CHECK
+        if (repository.owner.toString() !== userId) {
+            return res.status(403).json({
+                error: "You can only edit your own repositories"
+            });
+        }
+
+        repository.name = name || repository.name;
+        repository.description = description || repository.description;
+
+        if (content) {
+            repository.content = content;
+        }
+
+        if (visibility !== undefined) {
+            repository.visibility = visibility;
+        }
 
         const updatedRepository = await repository.save();
+
         res.json({
             message: "Repository updated successfully",
             repository: updatedRepository
         });
-    }catch(err){
+
+    } catch (err) {
         console.error("Error updating repository: ", err.message);
         res.status(500).send("Internal Server Error");
     }
